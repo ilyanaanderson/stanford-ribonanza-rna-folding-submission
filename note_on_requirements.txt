@@ -1,0 +1,20 @@
+Python and pip versions:
+python==3.9
+pip==23.3.1
+
+In addition to installing requirements.txt, EternaFold package can be installed with conda.
+The instructions are given here: https://bioconda.github.io/
+At the time of the competition, the instructions were to run the following commands:
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+
+After this, the eterna-installing command could be used:
+conda install -c bioconda eternafold --yes
+
+This notebook mentions the necessary environment variables:
+https://www.kaggle.com/code/brainbowrna/rna-science-computational-environment
+
+In my case, conda did not set these variables correctly, and I had to manually change them in appropriate files.
+(I used grep to find where these variables are located and changed those files accordingly.)
