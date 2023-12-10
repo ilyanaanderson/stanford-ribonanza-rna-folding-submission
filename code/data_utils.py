@@ -109,4 +109,32 @@ def all_info_from_seq(row):
                             'nump_react_a', 'nump_react_d', 'error_a', 'error_d', 'non_nan_count_a', 'non_nan_count_d'])
 
 
+def all_info_from_seq_no_bpp(row):
+    # received 'sequence', 'nump_react_a', 'nump_react_d', 'error_a', 'error_d', 'non_nan_count_a', 'non_nan_count_d'
+    seq = row['sequence'].strip()
+    s_len = len(seq)
+    struct = mfe(seq, package="eternafold")
+
+    seq_list = [*seq]
+    seq_inds = np.array([NUCLEOTIDES_DICT[char] for char in seq_list])
+    seq_inds = np.insert(seq_inds, 0, EOS)
+    seq_inds = np.insert(seq_inds, len(seq_inds), EOS)
+
+    struct_list = [*struct]
+    struct_inds = np.array([STRUCT_DICT[char] for char in struct_list])
+    struct_inds = np.insert(struct_inds, 0, EOS)
+    struct_inds = np.insert(struct_inds, len(struct_inds), EOS)
+
+    # seq-struct-inds-new:
+    tmp = ''.join(a + b for a, b in zip(seq, struct))
+    seq_struct_inds = np.array([NUCLEOTIDES_STRUCT_DICT[tmp[i:i + 2]] for i in range(0, len(tmp), 2)])
+    seq_struct_inds = np.insert(seq_struct_inds, 0, EOS)
+    seq_struct_inds = np.insert(seq_struct_inds, len(seq_struct_inds), EOS)
+    return pd.Series([seq, s_len, struct, seq_inds, struct_inds, seq_struct_inds,
+                      row['nump_react_a'], row['nump_react_d'], row['error_a'], row['error_d'],
+                      row['non_nan_count_a'], row['non_nan_count_d']],
+                     index=['seq', 's_len', 'struct', 'seq_inds', 'struct_inds', 'seq_struct_inds',
+                            'nump_react_a', 'nump_react_d', 'error_a', 'error_d', 'non_nan_count_a', 'non_nan_count_d'])
+
+
 
