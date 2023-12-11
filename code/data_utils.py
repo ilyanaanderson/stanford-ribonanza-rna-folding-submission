@@ -166,3 +166,10 @@ def process_test_sequences(row):
     )
 
 
+########################################################
+# function for processing bpps that were saved into a parquet file
+def bpp_to_nump(list_of_ars):
+    one_ar = np.stack(list_of_ars, axis=0)
+    one_ar = np.float32(one_ar)
+    return one_ar
+
