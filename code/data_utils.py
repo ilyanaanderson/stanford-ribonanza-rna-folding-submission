@@ -42,10 +42,9 @@ NUCLEOTIDES_STRUCT_DICT = {
 
 
 #######################################
-# the processing of data happens in two stages
+# the processing of training and validation data happens in two stages
 # stage one is processing related to reactivities
-# stage two is working with sequence
-
+# stage two is working with sequence (extracting information from it)
 ##########################################
 # stage one functions:
 def noclip_nofilter_all_info(row):
@@ -97,7 +96,7 @@ def all_info_from_seq(row):
     struct_inds = np.insert(struct_inds, 0, EOS)
     struct_inds = np.insert(struct_inds, len(struct_inds), EOS)
 
-    # seq-struct-inds-new:
+    # seq-struct-inds:
     tmp = ''.join(a + b for a, b in zip(seq, struct))
     seq_struct_inds = np.array([NUCLEOTIDES_STRUCT_DICT[tmp[i:i + 2]] for i in range(0, len(tmp), 2)])
     seq_struct_inds = np.insert(seq_struct_inds, 0, EOS)
@@ -125,7 +124,7 @@ def all_info_from_seq_no_bpp(row):
     struct_inds = np.insert(struct_inds, 0, EOS)
     struct_inds = np.insert(struct_inds, len(struct_inds), EOS)
 
-    # seq-struct-inds-new:
+    # seq-struct-inds:
     tmp = ''.join(a + b for a, b in zip(seq, struct))
     seq_struct_inds = np.array([NUCLEOTIDES_STRUCT_DICT[tmp[i:i + 2]] for i in range(0, len(tmp), 2)])
     seq_struct_inds = np.insert(seq_struct_inds, 0, EOS)
@@ -136,5 +135,34 @@ def all_info_from_seq_no_bpp(row):
                      index=['seq', 's_len', 'struct', 'seq_inds', 'struct_inds', 'seq_struct_inds',
                             'nump_react_a', 'nump_react_d', 'error_a', 'error_d', 'non_nan_count_a', 'non_nan_count_d'])
 
+
+########################################################################
+# processing of test sequences for inference:
+def process_test_sequences(row):
+    seq = row['sequence'].strip()
+    s_len = len(seq)
+    struct = mfe(seq, package="eternafold")
+    # if bpps are used, they would have to be calculated in dataset and not here
+    # because test_sequences dataframe is too large (if bpp information is preserved, it would take too much memory)
+
+    seq_list = [*seq]
+    seq_inds = np.array([NUCLEOTIDES_DICT[char] for char in seq_list])
+    seq_inds = np.insert(seq_inds, 0, EOS)
+    seq_inds = np.insert(seq_inds, len(seq_inds), EOS)
+
+    struct_list = [*struct]
+    struct_inds = np.array([STRUCT_DICT[char] for char in struct_list])
+    struct_inds = np.insert(struct_inds, 0, EOS)
+    struct_inds = np.insert(struct_inds, len(struct_inds), EOS)
+
+    # possible to add seq_struct_inds (analogous to all_info_from_seq functions)
+    # but seq_struct_inds are not used in this repository and are omitted here to make the resulting dataframe smaller
+
+    id_begin = row['id_min']
+    id_end = row['id_max']
+    return pd.Series(
+        [seq, seq_inds, struct_inds, s_len, id_begin, id_end],
+        ['seq', 'seq_inds', 'struct_inds', 's_len', 'id_begin', 'id_end']
+    )
 
 
