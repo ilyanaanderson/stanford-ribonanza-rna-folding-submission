@@ -52,7 +52,7 @@ if __name__ == '__main__':
         gc.collect()
         print(f"{i+1} files collected")
 
-    # row_group_size is necessary to avoid mistake when this file will be read (especially with bpp information)
+    # row_group_size is necessary to avoid mistake when this file will be read (with bpp information)
     # https://www.vortexa.com/insights/technology/when-parquet-columns-get-too-big/
     df_1.to_parquet(path_to_write, engine='pyarrow', index=False, row_group_size=10000)
 
