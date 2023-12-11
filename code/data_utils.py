@@ -173,3 +173,11 @@ def bpp_to_nump(list_of_ars):
     one_ar = np.float32(one_ar)
     return one_ar
 
+
+###########################################################
+# for generalization
+def process_generalization(row):
+    seq = row['sequence'].strip()
+    struct = mfe(seq, package="eternafold")
+    return pd.Series([seq, struct], ['sequence', 'structure'])
+
