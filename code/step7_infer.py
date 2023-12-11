@@ -12,7 +12,7 @@ from models import ModelThirtyNine, ModelThirtyTwo
 from seed_all import seed_everything
 
 SUBMISSION_NUMBER = 27  # the setup is shown in this repository for 27 and 23 only
-MODEL_EPOCH_NUMBER = 1  # 27 for submission number 27, and 44 for submission number 23
+MODEL_EPOCH_NUMBER = 27  # 27 for submission number 27, and 44 for submission number 23
 # (how many epochs the model was trained, starting from zero)
 
 BATCH = 128
