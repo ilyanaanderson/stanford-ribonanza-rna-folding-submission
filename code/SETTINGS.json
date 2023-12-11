@@ -11,8 +11,8 @@
   "VAL_DATA": "../data/processed/val.parquet",
   "TEST_DATA": "../data/processed/test.parquet",
   "GENERALIZATION_DATA": "../data/processed/generalization.parquet",
-  "MODEL_CHECKPOINT_DIR": "../models/",
+  "MODEL_DIR": "../models/",
   "SUBMISSION_DIR": "../submissions/",
-  "GENERALIZATION_PICTURES_ONE": "../pictures_one/",
-  "GENERALIZATION_PICTURES_TWO": "../pictures_two/"
+  "GENERALIZATION_PICTURES_ONE_DIR": "../pictures_one/",
+  "GENERALIZATION_PICTURES_TWO_DIR": "../pictures_two/"
 }
