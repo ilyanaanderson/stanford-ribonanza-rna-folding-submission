@@ -22,6 +22,7 @@ BPP_YES = False
 SUBMISSION_NUMBER = 27   # the setup is shown in this repository for 27 and 23 only
 # 27 doesn't need bpps; 23 needs bpps (change BPP_YES variable accordingly)
 
+# before running, the directory ../models/{SUBMISSION_NUMBER}/models needs to already exist
 if __name__ == '__main__':
     seed_everything()
     with open('SETTINGS.json') as f:
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         dataset_val_skeleton = DatasetTen
         model_skeleton = ModelThirtyTwo
 
-    parent_dir_string = f"{SUBMISSION_NUMBER}/models/"
+    parent_dir_string = f"{SUBMISSION_NUMBER}"
     parent_dir_for_models_for_learner = os.path.join(model_dir, parent_dir_string)  # this directory needs to exist
 
     df = pd.read_parquet(train_data_path, engine='pyarrow')

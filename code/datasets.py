@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import math
+from arnie.bpps import bpps
 
 
 TARGET_LEN = 457
@@ -11,8 +12,19 @@ TARGET_LEN_EOS = 459
 NUM_OF_REACTIVITIES = 206
 EOS = 2
 BOS = 1
+NUCLEOTIDES_DICT = {
+    'A': 3,
+    'C': 4,
+    'G': 5,
+    'U': 6
+}
+STRUCT_DICT = {
+    '.': 3,
+    '(': 4,
+    ')': 5,
+}
 
-# this file is for datasets that receive data in format:
+# datasets for training/validation receive data in format:
 # 'seq' is string sequence
 # 's_len' is int64 sequence length
 # 'struct' is dot-parentheses string
@@ -87,6 +99,83 @@ class DatasetEight(Dataset):
         label['react_d'] = react_tensor_d
         label['react_attn_d'] = react_attn_d
         return data, label
+
+
+# if it was trained with DatasetEight or DatasetTwelve, DatasetEightInfer is used for inference
+class DatasetEightInfer(Dataset):
+    def __init__(self, df):
+        self.df = df
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        data = {}
+        ids = torch.zeros(4, dtype=torch.int64)
+
+        s_len = row['s_len']
+        nump_seq = row['seq_inds'].copy()
+        nump_struct = row['struct_inds'].copy()
+
+        seq = torch.from_numpy(nump_seq)
+        pad_left_num = math.trunc((TARGET_LEN - s_len) / 2)  # left as is since 2 was added to target_len and to s_len
+        pad_right_num = TARGET_LEN - s_len - pad_left_num  # left as is
+        seq_tensor = F.pad(seq, (pad_left_num, pad_right_num))  # pads with zeros by default
+        mask = seq_tensor != 0
+
+        struct = torch.from_numpy(nump_struct)
+        struct_tensor = F.pad(struct, (pad_left_num, pad_right_num))  # pads with zeros by default
+
+        # work on ids
+        ids[0] = row['id_begin']
+        ids[1] = row['id_end']
+        ids[2] = pad_left_num + 1  # slice start (adding 1 because 'eos' token was added, but we don't collect reactivity from it)
+        ids[3] = s_len
+
+        data['info1'] = seq_tensor
+        data['info2'] = struct_tensor
+        data['mask'] = mask
+
+        return data, ids
+
+
+# for testing generalization of models trained with DatasetEight or DatasetTwelve
+class DatasetEightInferGeneralization(Dataset):
+    def __init__(self, df):
+        self.df = df
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        data = {}
+        ids = 0.0
+
+        seq = row['sequence']
+        struct = row['structure']
+
+        seq_list = [*seq]
+        seq_inds = np.array([NUCLEOTIDES_DICT[char] for char in seq_list])
+        seq_inds = np.insert(seq_inds, 0, EOS)
+        nump_seq = np.insert(seq_inds, len(seq_inds), EOS)
+
+        struct_list = [*struct]
+        struct_inds = np.array([STRUCT_DICT[char] for char in struct_list])
+        struct_inds = np.insert(struct_inds, 0, EOS)
+        nump_struct = np.insert(struct_inds, len(struct_inds), EOS)
+
+        seq_tensor = torch.from_numpy(nump_seq)
+        mask = seq_tensor != 0
+
+        struct_tensor = torch.from_numpy(nump_struct)
+
+        data['info1'] = seq_tensor
+        data['info2'] = struct_tensor
+        data['mask'] = mask
+
+        return data, ids
 
 
 # this dataset feeds seq_inds as info1, bpp as info2, and mask as mask (data dict). Label stays the same
@@ -208,6 +297,99 @@ class DatasetTen(Dataset):
         return data, label
 
 
+# for inference for models trained with DatasetTen or DatasetEleven
+class DatasetTenInfer(Dataset):
+    def __init__(self, df):
+        self.df = df
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        data = {}
+        ids = torch.zeros(4, dtype=torch.int64)
+
+        s_len = row['s_len']
+        nump_seq = row['seq_inds'].copy()
+        nump_struct = row['struct_inds'].copy()
+
+        # calculating nump_bpp
+        sequence = row['seq']
+        nump_bpp = bpps(sequence, package="eternafold")
+        nump_bpp = np.float32(nump_bpp)
+
+        seq = torch.from_numpy(nump_seq)
+        pad_left_num = math.trunc((TARGET_LEN - s_len) / 2)  # left as is since 2 was added to target_len and to s_len
+        pad_right_num = TARGET_LEN - s_len - pad_left_num  # left as is
+        seq_tensor = F.pad(seq, (pad_left_num, pad_right_num))  # pads with zeros by default
+        mask = seq_tensor != 0
+
+        struct = torch.from_numpy(nump_struct)
+        struct_tensor = F.pad(struct, (pad_left_num, pad_right_num))  # pads with zeros by default
+
+        bpp = torch.from_numpy(nump_bpp)
+        bpp_tensor = F.pad(bpp, (pad_left_num + 1, pad_right_num + 1, pad_left_num + 1, pad_right_num + 1))
+
+        # work on ids
+        ids[0] = row['id_begin']
+        ids[1] = row['id_end']
+        ids[2] = pad_left_num + 1  # slice start (adding 1 because 'eos' token was added, but we don't collect reactivity from it)
+        ids[3] = s_len
+
+        data['info1'] = seq_tensor
+        data['info2'] = bpp_tensor
+        data['info3'] = struct_tensor
+        data['mask'] = mask
+
+        return data, ids
+
+
+# for generalization test for models trained with DatasetTen or DatasetEleven
+class DatasetTenInferGeneralization(Dataset):
+    def __init__(self, df):
+        self.df = df
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        data = {}
+        ids = 0.0
+
+        seq = row['sequence']
+        struct = row['structure']
+
+        seq_list = [*seq]
+        seq_inds = np.array([NUCLEOTIDES_DICT[char] for char in seq_list])
+        seq_inds = np.insert(seq_inds, 0, EOS)
+        nump_seq = np.insert(seq_inds, len(seq_inds), EOS)
+
+        struct_list = [*struct]
+        struct_inds = np.array([STRUCT_DICT[char] for char in struct_list])
+        struct_inds = np.insert(struct_inds, 0, EOS)
+        nump_struct = np.insert(struct_inds, len(struct_inds), EOS)
+
+        nump_bpp = bpps(seq, package="eternafold")
+        nump_bpp = np.float32(nump_bpp)
+
+        seq_tensor = torch.from_numpy(nump_seq)
+        mask = seq_tensor != 0
+
+        bpp = torch.from_numpy(nump_bpp)
+        bpp_tensor = F.pad(bpp, (1, 1, 1, 1))
+
+        struct_tensor = torch.from_numpy(nump_struct)
+
+        data['info1'] = seq_tensor
+        data['info2'] = bpp_tensor
+        data['info3'] = struct_tensor
+        data['mask'] = mask
+
+        return data, ids
+
+
 # similar to DatasetTen, but can perturb targets according to errors
 class DatasetEleven(Dataset):
     def __init__(self, df):
@@ -282,7 +464,7 @@ class DatasetEleven(Dataset):
 
 
 # this dataset feeds seq_inds as info1, struct_inds as info2, and mask as mask (data dict). Label stays the same
-# same as DatasetEight, but it can perturb reactivities in the same way as DatasetEleven
+# same as DatasetEight, but it can perturb reactivities in the same way as DatasetEleven does
 class DatasetTwelve(Dataset):
     def __init__(self, df):
         self.df = df
