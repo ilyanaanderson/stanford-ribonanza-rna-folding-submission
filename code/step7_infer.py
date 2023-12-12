@@ -47,6 +47,8 @@ def batch_to_csv(output, ids, main_path_for_parquets):
 
 
 # before running, folder ../submissions/{SUBMISSION_NUMBER}/all needs to already exist
+# for submission number 23, it runs for a very long time (eight plus hours) because bpps are not saved
+# and need to be calculated in dataset
 if __name__ == '__main__':
     seed_everything()
     with open('SETTINGS.json') as f:
@@ -67,14 +69,16 @@ if __name__ == '__main__':
     if SUBMISSION_NUMBER == 27:
         dataset_skeleton = DatasetEightInfer
         model_skeleton = ModelThirtyNine
+        num_workers = 0
     elif SUBMISSION_NUMBER == 23:
         dataset_skeleton = DatasetTenInfer
         model_skeleton = ModelThirtyTwo
+        num_workers = 40
 
     # dataset and dataloader
     dataset = dataset_skeleton(df=df)
     loader = DataLoader(dataset=dataset, batch_size=BATCH, pin_memory=False, shuffle=False, device=device,
-                        num_workers=40)  # num_workers is set to 40 for bpps (submission number 23)
+                        num_workers=num_workers)  # num_workers is set to 40 for bpps (submission number 23)
 
     # model
     model = model_skeleton()

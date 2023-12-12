@@ -34,15 +34,17 @@ if __name__ == '__main__':
         dataset_skeleton = DatasetEightInferGeneralization
         model_skeleton = ModelThirtyNine
         model = model_skeleton()
+        num_work = 0
     elif SUBMISSION_NUMBER == 23:
         dataset_skeleton = DatasetTenInferGeneralization
         model_skeleton = ModelThirtyTwo
         model = model_skeleton(num_tokens=LEN_FOR_GENERALIZATION)
+        num_work = 40
 
     df = pd.read_parquet(file_to_read)
 
     dataset = dataset_skeleton(df=df)
-    loader = DataLoader(dataset=dataset, batch_size=BATCH, pin_memory=False, shuffle=False)
+    loader = DataLoader(dataset=dataset, batch_size=BATCH, pin_memory=False, shuffle=False, num_workers=num_work)
 
     state = torch.load(model_to_load, map_location='cpu')
     model.load_state_dict(state)
