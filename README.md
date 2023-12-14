@@ -131,15 +131,15 @@ by step fashion. Some steps (step 3 and 4) need to be re-run twice:
 for training
 and for validation data separately. 
 
-Step 1: The script processes training data and saves it as a parquet file. 
+*Step 1:* The script processes training data and saves it as a parquet file. 
 However, after this step the data is not ready to use. This is only an 
 "intermediate" step in data processing. In this step, I create one dataframe 
 where each row carries information about both types of reactivity. 
 Sequences are not processed in this step.
 
-Step 2: Analogous step for validation data.
+*Step 2:* Analogous step for validation data.
 
-Step 3: Sequences are processed for training data and for validation data.
+*Step 3:* Sequences are processed for training data and for validation data.
 MODE variable ("train" or "validation") and BPP (boolean True or False)
 need to be set at the beginning of the script. 
 It is possible to extract BPP information during this step. However, 
@@ -152,7 +152,7 @@ compared to "submission-27". As the result of this step, small (partial)
 dataframes are written to "partial" files. There should be 17 files for 
 "Quick_Start" training data and 4 files for validation.
 
-Step 4: The "partial" files from the previous step are collected 
+*Step 4:* The "partial" files from the previous step are collected 
 into one file. I set this up in this way due to historical reasons: 
 I was struggling to save BPP information for later use in training, so 
 I solved the problem by processing smaller chunks of the dataframe at a time
@@ -162,7 +162,7 @@ I wanted to write these files into storage just in case
 Since they are written as "partial" files, I collect them into one
 file for convenience. 
 
-Step 5: Processing test data will require a lot of time 
+*Step 5:* Processing test data will require a lot of time 
 if the dataframe is 
 processed at once. An analogous script 
 took about 
@@ -176,25 +176,25 @@ a way analogous to training data (as "partial" files)
 could be beneficial if a lot of experiments
 use BPPs. 
 
-Step 6: Training. SUBMISSION_NUMBER (23 or 27) needs to be specified 
+*Step 6:* Training. SUBMISSION_NUMBER (23 or 27) needs to be specified 
 together with BPP_YES (whether the training will require BPPs). BPPs can 
 be used for "submission-23" if BPP information was saved to storage 
 in previous steps.
 
-Step 7: Inference. Historically, I was writing smaller dataframes 
+*Step 7:* Inference. Historically, I was writing smaller dataframes 
 into storage. This script runs less than an hour for "submission-27" on my system 
 and 8-10 hours for "submission-23" (because of calculating BPPs).
 
-Step 8: The smaller dataframes are collected into one CSV ready 
+*Step 8:* The smaller dataframes are collected into one CSV ready 
 for submission.
 
-Step 9: This script generates reactivity vs. sequence plot for 
+*Step 9:* This script generates reactivity vs. sequence plot for 
 mutate and map sequences, according to 
 ["How to check if your model generalizes to long sequences" discussion](https://www.kaggle.com/competitions/stanford-ribonanza-rna-folding/discussion/444653).
 
-Step 10: This script prepares data for the second plot (see next step).
+*Step 10:* This script prepares data for the second plot (see next step).
 
-Step 11: This script generates the secondary structure plot described in 
+*Step 11:* This script generates the secondary structure plot described in 
 ["How to check if your model generalizes to long sequences" discussion](https://www.kaggle.com/competitions/stanford-ribonanza-rna-folding/discussion/444653).
 
 The naming of classes in this repository relies on numbers (e.g., 
@@ -244,7 +244,7 @@ experiments, which might have been the reason why they did not perform well.
 ## Acknowledgements
 
 The [starter notebook](https://www.kaggle.com/code/iafoss/rna-starter-0-186-lb) 
-published by Iafoss [[1](#references)] was crucial for me. 
+published by Iafoss [[1](#references)] was crucial for me. Thank you so much for creating it.
 
 Additionally, when including rotary embeddings, I relied on the code 
 published by Arjun Sarkar in an article ["Build your own Transformer 
