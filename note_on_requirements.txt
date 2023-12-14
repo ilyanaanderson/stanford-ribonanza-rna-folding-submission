@@ -20,5 +20,8 @@ In my case, conda did not set these variables correctly, and I had to manually c
 (I used grep to find where these variables are located and changed those files accordingly.)
 
 ###########################################
-This solution was run on a system with 20 CPUs, 128 GB of RAM memory, one GPU (gpu with 10 GB of memory).
-It is possible to run this solution for the submission_number==27 (no BPPs) with 64 GB of memory.
+This solution was run on a system with 20 CPUs, 128 GB of RAM memory, one GPU (GPU with 10 GB of memory).
+It is possible to run this solution for the submission_number==27 (no BPPs) with 64 GB of memory (RAM).
+
+Processor: 12th Gen Intel® Core™ i7-12700KF × 20
+Graphics: NVIDIA Corporation GA102 [GeForce RTX 3080 Lite Hash Rate]
