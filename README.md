@@ -6,6 +6,9 @@
 
 * Data: https://www.kaggle.com/competitions/stanford-ribonanza-rna-folding/data
 
+This repository is set up to reproduce two of my solutions to the competition.
+For more details on the code, see [Notes on the code](#notes-on-the-code) section.
+
 ## Summary 
 
 The [notebook published by Iafoss](https://www.kaggle.com/code/iafoss/rna-starter-0-186-lb) [[1](#references)] was my starting point. 
