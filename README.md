@@ -101,7 +101,7 @@ found in the code.
 
 ## Training
 
-The training procedure was adopted from [the starter 
+The training procedure was adapted from [the starter 
 notebook](https://www.kaggle.com/code/iafoss/rna-starter-0-186-lb) [[1](#references)]. 
 
 The training was performed for 45 epochs on 
