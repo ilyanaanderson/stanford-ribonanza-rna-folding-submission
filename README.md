@@ -173,9 +173,8 @@ took about
 chunks, similar to training and validation data. 
 However, I did not re-write it. Also, BPPs are not saved for test data because 
 I was running out of time during the competition: instead, 
-if BPPs were used in training, they would have to be calculated during 
-inference. Saving BPP information into storage for test sequences in 
-a way analogous to training data (as "partial" files) 
+if BPPs are used in training, they will have to be calculated during 
+inference. Saving BPP information into storage for test sequences 
 could be beneficial if a lot of experiments
 use BPPs. 
 
