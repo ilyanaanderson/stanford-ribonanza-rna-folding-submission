@@ -134,6 +134,14 @@ by step fashion. Some steps (step 3 and 4) need to be re-run twice:
 for training
 and for validation data separately. 
 
+The overall idea was to pre-process the training (and validation) data with maximum extraction of 
+information: all data-related calculations should be done during this step. 
+The resulting dataframe is saved into storage. 
+During training, this dataframe is read from the storage and all columns 
+that are unnecessary for a specific experiment are dropped. This setup allows 
+a great flexibility in designing experiments. Ideally, the test data should be 
+processed in a similar way, but I did not have enough time. 
+
 *Step 1:* The script processes training data and saves it as a parquet file. 
 However, after this step the data is not ready to use. This is only an 
 "intermediate" step in data processing. In this step, I create one dataframe 
